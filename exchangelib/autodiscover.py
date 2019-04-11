@@ -170,7 +170,7 @@ def close_connections():
     _autodiscover_cache.close()
 
 
-def discover(email, credentials):
+def discover(email, credentials, host=None):
     """
     Performs the autodiscover dance and returns the primary SMTP address of the account and a Protocol on success. The
     autodiscover and EWS server might not be the same, so we use a different Protocol to do the autodiscover request,
@@ -179,7 +179,9 @@ def discover(email, credentials):
     log.debug('Attempting autodiscover on email %s', email)
     if not isinstance(credentials, Credentials):
         raise ValueError("'credentials' %r must be a Credentials instance" % credentials)
-    domain = get_domain(email)
+    domain = host
+    if not domain:
+        domain = get_domain(email)
     # We may be using multiple different credentials and changing our minds on TLS verification. This key combination
     # should be safe.
     autodiscover_key = (domain, credentials)

@@ -41,7 +41,7 @@ class Account(object):
     """Models an Exchange server user account. The primary key for an account is its PrimarySMTPAddress
     """
     def __init__(self, primary_smtp_address, fullname=None, access_type=None, autodiscover=False, credentials=None,
-                 config=None, locale=None, default_timezone=None):
+                 config=None, locale=None, default_timezone=None, host=None):
         """
         :param primary_smtp_address: The primary email address associated with the account on the Exchange server
         :param fullname: The full name of the account. Optional.
@@ -58,6 +58,7 @@ class Account(object):
             raise ValueError("primary_smtp_address '%s' is not an email address" % primary_smtp_address)
         self.primary_smtp_address = primary_smtp_address
         self.fullname = fullname
+        self.host = host
         try:
             self.locale = locale or getlocale()[0] or None  # get_locale() might not be able to determine the locale
         except ValueError as e:
@@ -77,7 +78,7 @@ class Account(object):
             if config:
                 raise AttributeError('config is ignored when autodiscover is active')
             self.primary_smtp_address, self.protocol = discover(email=self.primary_smtp_address,
-                                                                credentials=credentials)
+                                                                credentials=credentials, host=self.host)
         else:
             if not config:
                 raise AttributeError('non-autodiscover requires a config')
